@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Terminal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:wght@400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Left Navigation Sidebar -->
+        <div class="nav-sidebar">
+            <div class="nav-buttons">
+                <button class="nav-btn add-btn" id="add-btn" title="New Conversation">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="8" y1="10" x2="16" y2="10"/>
+                    </svg>
+                </button>
+                <button class="nav-btn mcp-btn" id="mcp-btn" title="MCP Tools">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <circle cx="15.5" cy="8.5" r="1.5"/>
+                        <circle cx="12" cy="15.5" r="1.5"/>
+                        <path d="M8.5 10l3 3 3-3"/>
+                    </svg>
+                </button>
+                <button class="nav-btn tokens-btn" id="tokens-btn" title="Token Statistics">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        <circle cx="12" cy="12" r="1"/>
+                    </svg>
+                </button>
+                <button class="nav-btn chat-history-btn" id="chat-history-btn" title="Chat History">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/>
+                        <path d="M12 7v6"/>
+                        <path d="M9 10h6"/>
+                    </svg>
+                </button>
+                <button class="nav-btn settings-btn" id="settings-btn" title="Settings">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="nav-user-avatar">
+                <div class="user-avatar" id="user-avatar">MG</div>
+            </div>
+        </div>
+
+
+        <!-- File Content Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>File Content</h3>
+                <button class="sidebar-close" id="sidebar-close">×</button>
+            </div>
+            <div class="sidebar-content" id="sidebar-content">
+                <!-- File content will be loaded here -->
+            </div>
+        </div>
+
+        
+        <!-- Main Content -->
+        <div class="main-content">
+
+            <!-- Chat Interface (shown when in file-tree mode or no nav selection) -->
+            <div class="chat-interface" id="chat-interface">
+                <div class="chat-header">
+                <div class="greeting">
+                    <svg width="36" height="30" viewBox="0 0 123 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M46.2032 59.5747L56.4346 53.5065L56.6032 52.975L56.4346 52.679H55.9286L54.214 52.5687L48.3676 52.4032L43.3081 52.1825L38.3892 51.9067L37.1524 51.6309L36 50.0035L36.1124 49.2036L37.1524 48.4589L38.6422 48.5968L41.9308 48.845L46.8779 49.2036L50.4476 49.4243L55.76 50.0035H56.6032L56.7157 49.6449L56.4346 49.4243L56.2097 49.2036L51.0941 45.5351L45.5567 41.6735L42.6616 39.4393L41.1157 38.3084L40.3286 37.2603L39.9914 34.9433L41.3968 33.2884L43.3081 33.4263L43.7859 33.5642L45.7254 35.1364L49.8573 38.5291L55.2541 42.7216L56.0411 43.4112L56.358 43.185L56.4065 43.025L56.0411 42.3907L53.1179 36.7913L49.9978 31.0817L48.5924 28.7096L48.227 27.3029C48.0855 26.7126 48.0021 26.2242 48.0021 25.6204L49.6043 23.3034L50.5038 23L52.6681 23.3034L53.5676 24.1309L54.9168 27.3857L57.0811 32.4885L60.454 39.4393L61.4379 41.508L61.9719 43.4112L62.1686 43.9905H62.5059V43.6594L62.787 39.7427L63.293 34.9433L63.7989 28.7648L63.9676 27.0271L64.7827 24.9308L66.413 23.7999L67.6779 24.4343L68.7178 26.0065L68.5773 27.0271L67.9589 31.2748L66.7503 37.9223L65.9633 42.3907H66.413L66.947 41.8114L69.0832 38.8325L72.653 34.0883L74.227 32.2126L76.0822 30.1439L77.2627 29.1509H79.5113L81.1416 31.7437L80.4108 34.4192L78.106 37.5085L76.1946 40.1289L73.4541 44.0124L71.7535 47.1349L71.906 47.3925L72.3157 47.3555L78.4994 45.9488L81.8443 45.3144L85.8357 44.5973L87.6346 45.4799L87.8313 46.3902L87.1286 48.2382L82.8562 49.3415L77.853 50.4173L70.4025 52.2723L70.32 52.3425L70.4174 52.4953L73.7773 52.8169L75.2108 52.8997H78.7243L85.2735 53.4237L86.9881 54.6098L88 56.0717L87.8313 57.2026L85.1892 58.6093L81.6476 57.7267L73.3557 55.6304L70.5167 54.8856H70.1233V55.1339L72.4843 57.5888L76.8411 61.7262L82.266 67.0772L82.547 68.4012L81.8443 69.4493L81.1135 69.339L76.3352 65.5326L74.48 63.8224L70.32 60.0988H70.0389V60.4849L70.9946 61.9744L76.0822 70.0561L76.3352 72.5386L75.9697 73.3385L74.6486 73.835L73.2151 73.5592L70.2076 69.1183L67.1438 64.1535L64.6703 59.685L64.3715 59.8845L62.8995 76.5105L62.2248 77.3655L60.6508 78L59.3297 76.9518L58.627 75.2417L59.3297 71.849L60.173 67.4358L60.8476 63.9328L61.466 59.5747L61.8436 58.1188L61.8103 58.0214L61.5085 58.075L58.4021 62.5812L53.68 69.339L49.9416 73.5592L49.0422 73.9453L47.4962 73.0902L47.6367 71.5732L48.5081 70.2216L53.68 63.2708L56.8 58.9403L58.8108 56.4545L58.7913 56.095L58.6802 56.085L44.9384 65.5602L42.493 65.8912L41.4249 64.843L41.5654 63.1329L42.0713 62.5812L46.2032 59.5747Z" fill="#D97757"/>
+                    </svg>
+                    <span id="greeting-text">Evening, mike</span>
+                </div>
+                <div class="header-controls">
+                    <button id="change-dir-btn" class="change-dir-btn" title="Change Working Directory">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/>
+                        </svg>
+                        <span id="current-dir-display"></span>
+                    </button>
+                    <button id="theme-toggle" class="theme-toggle" title="Toggle theme">
+                        <svg class="sun-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>
+                        </svg>
+                        <svg class="moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
+                    <!-- Auth Button -->
+                    <button id="auth-btn" class="auth-btn" title="Authentication" style="display: none;">
+                        <span>Auth</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m6 9 6 6 6-6"/>
+                        </svg>
+                    </button>
+                    <button id="scroll-to-bottom-btn" class="scroll-to-bottom-btn" title="滚动到底部">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m6 9 6 6 6-6"/>
+                        </svg>
+                    </button>
+                    <div class="model-selector">
+                        <span class="model-label">Claude Sonnet 4</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-container" id="chat-container">
+                <!-- Claude Thinking display when no output -->
+                <div class="claude-thinking-display" id="claude-thinking-display" style="display: none;">
+                    <svg width="24" height="24" viewBox="0 0 123 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="claude-thinking-icon">
+                        <path d="M46.2032 59.5747L56.4346 53.5065L56.6032 52.975L56.4346 52.679H55.9286L54.214 52.5687L48.3676 52.4032L43.3081 52.1825L38.3892 51.9067L37.1524 51.6309L36 50.0035L36.1124 49.2036L37.1524 48.4589L38.6422 48.5968L41.9308 48.845L46.8779 49.2036L50.4476 49.4243L55.76 50.0035H56.6032L56.7157 49.6449L56.4346 49.4243L56.2097 49.2036L51.0941 45.5351L45.5567 41.6735L42.6616 39.4393L41.1157 38.3084L40.3286 37.2603L39.9914 34.9433L41.3968 33.2884L43.3081 33.4263L43.7859 33.5642L45.7254 35.1364L49.8573 38.5291L55.2541 42.7216L56.0411 43.4112L56.358 43.185L56.4065 43.025L56.0411 42.3907L53.1179 36.7913L49.9978 31.0817L48.5924 28.7096L48.227 27.3029C48.0855 26.7126 48.0021 26.2242 48.0021 25.6204L49.6043 23.3034L50.5038 23L52.6681 23.3034L53.5676 24.1309L54.9168 27.3857L57.0811 32.4885L60.454 39.4393L61.4379 41.508L61.9719 43.4112L62.1686 43.9905H62.5059V43.6594L62.787 39.7427L63.293 34.9433L63.7989 28.7648L63.9676 27.0271L64.7827 24.9308L66.413 23.7999L67.6779 24.4343L68.7178 26.0065L68.5773 27.0271L67.9589 31.2748L66.7503 37.9223L65.9633 42.3907H66.413L66.947 41.8114L69.0832 38.8325L72.653 34.0883L74.227 32.2126L76.0822 30.1439L77.2627 29.1509H79.5113L81.1416 31.7437L80.4108 34.4192L78.106 37.5085L76.1946 40.1289L73.4541 44.0124L71.7535 47.1349L71.906 47.3925L72.3157 47.3555L78.4994 45.9488L81.8443 45.3144L85.8357 44.5973L87.6346 45.4799L87.8313 46.3902L87.1286 48.2382L82.8562 49.3415L77.853 50.4173L70.4025 52.2723L70.32 52.3425L70.4174 52.4953L73.7773 52.8169L75.2108 52.8997H78.7243L85.2735 53.4237L86.9881 54.6098L88 56.0717L87.8313 57.2026L85.1892 58.6093L81.6476 57.7267L73.3557 55.6304L70.5167 54.8856H70.1233V55.1339L72.4843 57.5888L76.8411 61.7262L82.266 67.0772L82.547 68.4012L81.8443 69.4493L81.1135 69.339L76.3352 65.5326L74.48 63.8224L70.32 60.0988H70.0389V60.4849L70.9946 61.9744L76.0822 70.0561L76.3352 72.5386L75.9697 73.3385L74.6486 73.835L73.2151 73.5592L70.2076 69.1183L67.1438 64.1535L64.6703 59.685L64.3715 59.8845L62.8995 76.5105L62.2248 77.3655L60.6508 78L59.3297 76.9518L58.627 75.2417L59.3297 71.849L60.173 67.4358L60.8476 63.9328L61.466 59.5747L61.8436 58.1188L61.8103 58.0214L61.5085 58.075L58.4021 62.5812L53.68 69.339L49.9416 73.5592L49.0422 73.9453L47.4962 73.0902L47.6367 71.5732L48.5081 70.2216L53.68 63.2708L56.8 58.9403L58.8108 56.4545L58.7913 56.095L58.6802 56.085L44.9384 65.5602L42.493 65.8912L41.4249 64.843L41.5654 63.1329L42.0713 62.5812L46.2032 59.5747Z" fill="#D97757"/>
+                    </svg>
+                    <span class="claude-thinking-text">Claude Thinking <span class="time-info">about <span id="thinking-time">5s</span></span></span>
+                </div>
+                
+                
+                <!-- Messages will be added here dynamically -->
+            </div>
+            
+            <!-- Todo List Section -->
+            <div class="todo-panel" id="todo-panel" style="display: none;">
+                <div class="todo-header">
+                    <div class="todo-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 11l3 3L22 4"/>
+                            <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.44 0 2.79.34 3.99.94"/>
+                        </svg>
+                        <span id="todo-count">4</span> To-dos
+                    </div>
+                </div>
+                <div class="todo-list" id="todo-list">
+                    <!-- All todos will be populated here -->
+                </div>
+            </div>
+
+            <!-- CLAUDE.md Quick Input Modal -->
+            <div class="claude-md-modal-overlay" id="claude-md-editor" style="display: none;">
+                <div class="claude-md-input-modal">
+                    <div class="claude-md-input-header">
+                        <h3>Add to CLAUDE.md</h3>
+                        <button class="claude-md-close-btn" id="claude-md-back-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="claude-md-input-content">
+                        <div class="input-group">
+                            <div class="input-prefix">-</div>
+                            <input 
+                                type="text" 
+                                id="claude-md-input" 
+                                class="claude-md-input" 
+                                placeholder="Enter instruction or note..."
+                                autocomplete="off"
+                                spellcheck="false"
+                            />
+                        </div>
+                        <div class="input-actions">
+                            <button class="claude-md-add-btn" id="claude-md-save-btn">
+                                Add to File
+                            </button>
+                        </div>
+                        <div class="status-display">
+                            <span id="claude-md-status" class="status-text">Ready</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div class="settings-fullpage" id="settings-fullpage" style="display: none;">
+                <div class="settings-header">
+                    <button class="back-to-chat-btn" id="settings-back-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m15 18-6-6 6-6"/>
+                        </svg>
+                        Back to Chat
+                    </button>
+                </div>
+                
+                <div class="settings-content">
+                    <!-- User Rules Section -->
+                    <div class="rules-section">
+                        <h3>User Rules</h3>
+                        <div class="rules-list" id="user-rules-list">
+                            <!-- User rules will be displayed here -->
+                        </div>
+                        <div class="add-rule-form">
+                            <div class="rule-input-group">
+                                <span class="rule-prefix">-</span>
+                                <input 
+                                    type="text" 
+                                    id="user-rule-input" 
+                                    class="rule-input" 
+                                    placeholder="Add new user rule..."
+                                />
+                                <button class="add-rule-btn" id="add-user-rule-btn">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Rules Section -->
+                    <div class="rules-section">
+                        <h3>Project Rules</h3>
+                        <div class="rules-list" id="project-rules-list">
+                            <!-- Project rules will be displayed here -->
+                        </div>
+                        <div class="add-rule-form">
+                            <div class="rule-input-group">
+                                <span class="rule-prefix">-</span>
+                                <input 
+                                    type="text" 
+                                    id="project-rule-input" 
+                                    class="rule-input" 
+                                    placeholder="Add new project rule..."
+                                />
+                                <button class="add-rule-btn" id="add-project-rule-btn">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Page MCP Management View -->
+            <div class="mcp-fullpage" id="mcp-fullpage" style="display: none;">
+                <!-- Collapsed Auth Button for MCP page -->
+                <div class="auth-collapsed mcp-auth-collapsed" id="mcp-auth-collapsed" style="display: none;">
+                    <button class="auth-collapsed-btn" id="mcp-auth-collapsed-btn">
+                        <span>Auth</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m6 9 6 6 6-6"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="mcp-fullpage-header">
+                    <button class="back-to-chat-btn" id="back-to-chat-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m15 18-6-6 6-6"/>
+                        </svg>
+                        Back to Chat
+                    </button>
+                </div>
+                <div class="mcp-fullpage-content">
+                    <div class="mcp-header">
+                        <div class="mcp-search">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="M21 21l-4.35-4.35"/>
+                            </svg>
+                            <input type="text" placeholder="Search MCP servers..." class="mcp-search-input" id="mcp-search-input-fullpage">
+                        </div>
+                        <button class="mcp-detect-btn" id="mcp-detect-btn" title="检测MCP服务器状态">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                            </svg>
+                            检测状态
+                        </button>
+                    </div>
+                    
+                    <div class="mcp-list" id="mcp-list-fullpage">
+                        <div class="mcp-item" data-mcp="context7">
+                            <div class="mcp-item-content">
+                                <div class="mcp-item-header">
+                                    <div class="mcp-item-title">Context7</div>
+                                </div>
+                                <div class="mcp-item-description">Smart context management</div>
+                            </div>
+                            <div class="mcp-item-status" data-status="pending">install</div>
+                        </div>
+                        
+                        <div class="mcp-item" data-mcp="atlassian">
+                            <div class="mcp-item-content">
+                                <div class="mcp-item-header">
+                                    <div class="mcp-item-title">Atlassian</div>
+                                </div>
+                                <div class="mcp-item-description">Project management tools</div>
+                            </div>
+                            <div class="mcp-item-status" data-status="pending">install</div>
+                        </div>
+                        
+                        <div class="mcp-item" data-mcp="notion">
+                            <div class="mcp-item-content">
+                                <div class="mcp-item-header">
+                                    <div class="mcp-item-title">Notion</div>
+                                </div>
+                                <div class="mcp-item-description">Notes and knowledge base</div>
+                            </div>
+                            <div class="mcp-item-status" data-status="pending">install</div>
+                        </div>
+                        
+                        <div class="mcp-item" data-mcp="playwright">
+                            <div class="mcp-item-content">
+                                <div class="mcp-item-header">
+                                    <div class="mcp-item-title">Playwright</div>
+                                </div>
+                                <div class="mcp-item-description">End-to-end testing framework</div>
+                            </div>
+                            <div class="mcp-item-status" data-status="pending">install</div>
+                        </div>
+                        
+                        <div class="mcp-item mcp-item-custom" data-mcp="custom">
+                            <div class="mcp-item-content">
+                                <div class="mcp-item-header">
+                                    <div class="mcp-item-title">Custom MCP</div>
+                                </div>
+                                <div class="mcp-item-description">Add custom MCP command</div>
+                            </div>
+                            <div class="mcp-item-status" data-status="custom">add</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Custom MCP Command Modal -->
+            <div id="custom-mcp-modal" class="custom-mcp-modal" style="display: none;">
+                <div class="custom-mcp-modal-content">
+                    <div class="custom-mcp-modal-header">
+                        <h3>Custom MCP Command</h3>
+                        <button id="custom-mcp-close" class="custom-mcp-close">&times;</button>
+                    </div>
+                    <div class="custom-mcp-modal-body">
+                        <label for="custom-mcp-command">Enter terminal command:</label>
+                        <input type="text" id="custom-mcp-command" class="custom-mcp-input" placeholder="e.g: claude mcp add apple-docs -- npx -y @kimsungwhee/apple-docs-mcp@latest">
+                        <div class="custom-mcp-buttons">
+                            <button id="custom-mcp-execute" class="custom-mcp-execute-btn">Execute</button>
+                            <button id="custom-mcp-cancel" class="custom-mcp-cancel-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Username Change Modal -->
+            <div id="username-modal" class="username-modal" style="display: none;">
+                <div class="username-modal-content">
+                    <div class="username-modal-header">
+                        <h3>更改用户名</h3>
+                        <button id="username-close" class="username-close">&times;</button>
+                    </div>
+                    <div class="username-modal-body">
+                        <label for="username-input">输入新的用户名:</label>
+                        <input type="text" id="username-input" class="username-input" placeholder="请输入用户名" maxlength="20">
+                        <div class="username-buttons">
+                            <button id="username-save" class="username-save-btn">保存</button>
+                            <button id="username-cancel" class="username-cancel-btn">取消</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Directory Selection Modal -->
+            <div id="directory-modal" class="directory-modal" style="display: none;">
+                <div class="directory-modal-content">
+                    <div class="directory-modal-header">
+                        <h3>选择工作目录</h3>
+                        <button id="directory-modal-close" class="directory-modal-close">&times;</button>
+                    </div>
+                    <div class="directory-modal-body">
+                        <div class="directory-input-group">
+                            <label for="directory-path-input">目录路径:</label>
+                            <input type="text" id="directory-path-input" class="directory-path-input" placeholder="例如: ~/项目目录">
+                        </div>
+                        <div class="directory-browser" id="directory-browser">
+                            <div class="directory-browser-header">
+                                <span>浏览文件夹:</span>
+                            </div>
+                            <div class="directory-list" id="directory-list">
+                                <!-- 目录列表将在这里显示 -->
+                            </div>
+                        </div>
+                        <div class="directory-buttons">
+                            <button id="directory-select" class="directory-select-btn">确认选择</button>
+                            <button id="directory-cancel" class="directory-cancel-btn">取消</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Change Directory Modal -->
+            <div id="change-dir-modal" class="change-dir-modal" style="display: none;">
+                <div class="change-dir-modal-content">
+                    <div class="change-dir-modal-header">
+                        <h3>Change Working Directory</h3>
+                        <button id="change-dir-close" class="change-dir-close">&times;</button>
+                    </div>
+                    <div class="change-dir-modal-body">
+                        <div class="current-dir-info">
+                            <label>当前目录:</label>
+                            <div id="current-dir-path" class="current-dir-path"></div>
+                        </div>
+                        <label for="new-dir-path">Select new working directory:</label>
+                        <input type="text" id="new-dir-path" class="new-dir-input" placeholder="Enter directory path, e.g: ~/projects">
+                        <div class="change-dir-buttons">
+                            <button id="change-dir-confirm" class="change-dir-confirm-btn">Change Directory</button>
+                            <button id="change-dir-cancel" class="change-dir-cancel-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MCP Deletion Confirmation Modal -->
+            <div id="mcp-delete-modal" class="mcp-delete-modal" style="display: none;">
+                <div class="mcp-delete-modal-content">
+                    <div class="mcp-delete-modal-header">
+                        <h3>Remove MCP Server</h3>
+                        <button id="mcp-delete-close" class="mcp-delete-close">&times;</button>
+                    </div>
+                    <div class="mcp-delete-modal-body">
+                        <div class="mcp-delete-info">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
+                            </svg>
+                            <p>Are you sure you want to remove <strong id="mcp-delete-name"></strong>?</p>
+                            <p>This action cannot be undone.</p>
+                        </div>
+                        <div class="mcp-delete-buttons">
+                            <button id="mcp-delete-confirm" class="mcp-delete-confirm-btn">Remove MCP</button>
+                            <button id="mcp-delete-cancel" class="mcp-delete-cancel-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat History Deletion Confirmation Modal -->
+            <div id="chat-delete-modal" class="chat-delete-modal" style="display: none;">
+                <div class="chat-delete-modal-content">
+                    <div class="chat-delete-modal-header">
+                        <h3>删除历史对话</h3>
+                        <button id="chat-delete-close" class="chat-delete-close">&times;</button>
+                    </div>
+                    <div class="chat-delete-modal-body">
+                        <div class="chat-delete-info">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="warning-icon">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                            <p>确定要删除这个历史对话吗？</p>
+                            <p class="warning-text">删除对话将导致token统计不准确，因为已消耗的token无法重新计算。</p>
+                        </div>
+                        <div class="chat-delete-options">
+                            <label class="dont-show-again">
+                                <input type="checkbox" id="dont-show-delete-warning">
+                                <span class="checkmark"></span>
+                                不再显示此警告
+                            </label>
+                        </div>
+                        <div class="chat-delete-buttons">
+                            <button id="chat-delete-confirm" class="chat-delete-confirm-btn">确认删除</button>
+                            <button id="chat-delete-cancel" class="chat-delete-cancel-btn">取消</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            </div>
+
+
+            <!-- Input Container at Bottom -->
+            <div class="input-container">
+                
+                <!-- Image preview container -->
+                <div class="image-preview-container" id="image-preview-container" style="display: none;">
+                    <div class="image-preview-tag" id="image-preview-tag"></div>
+                </div>
+                
+                <!-- Action buttons above input on left -->
+                <div class="input-actions-left">
+                    <button class="input-button" id="image-upload-button" title="Upload Image">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="9" cy="9" r="2"/>
+                            <path d="M21 15l-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                        </svg>
+                    </button>
+                    <button class="input-button deep-think-button" id="deep-think-button" title="Deep Think">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.35-4.35"/>
+                        </svg>
+                        <span>Deep Think</span>
+                    </button>
+                </div>
+                
+                <div class="input-wrapper">
+                    <textarea 
+                        id="command-input" 
+                        placeholder="Type here ......" 
+                        rows="1"
+                        autocomplete="off"
+                        spellcheck="false"
+                    ></textarea>
+                    <button class="stop-button" id="stop-button" style="display: none;" title="Stop Response">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="stop-icon">
+                            <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/>
+                        </svg>
+                    </button>
+                    <button id="send-button" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 19V5M5 12l7-7 7 7"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Hidden file input -->
+                <input type="file" id="file-input" accept="image/*" style="display: none;">
+            </div>
+
+        </div>
+    </div>
+
+            <!-- Chat History Full Page -->
+            <div class="chat-history-fullpage" id="chat-history-fullpage" style="display: none;">
+                <div class="chat-history-header">
+                    <button class="back-to-chat-btn" id="chat-history-back-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m15 18-6-6 6-6"/>
+                        </svg>
+                        Back to Chat
+                    </button>
+                    <h3 style="font-weight: normal;">Your chat history</h3>
+                </div>
+
+
+                <div class="chat-history-content">
+
+
+                    <div class="chat-list-container">
+                        <div id="chat-list" class="chat-list">
+                            <div class="loading">Loading your chat history...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Token Statistics Full Page -->
+            <div class="token-statistics-fullpage" id="token-statistics-fullpage" style="display: none;">
+                <div class="token-statistics-header">
+                    <button class="back-to-chat-btn" id="token-statistics-back-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m15 18-6-6 6-6"/>
+                        </svg>
+                        Back to Chat
+                    </button>
+                    <h2>Token Usage Statistics</h2>
+                    <button class="refresh-btn" id="token-refresh-btn" title="刷新统计数据">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                            <path d="M21 3v5h-5"/>
+                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                            <path d="M3 21v-5h5"/>
+                        </svg>
+                        刷新
+                    </button>
+                </div>
+                
+                <div class="token-statistics-content">
+                    <div class="token-loading" id="token-loading">
+                        <div class="token-loading-spinner"></div>
+                        <div class="token-loading-text">
+                            <div id="token-current-file">正在扫描项目文件...</div>
+                            <div id="token-progress">0 / 0 文件已处理</div>
+                        </div>
+                    </div>
+                    <div class="token-results" id="token-results" style="display: none;">
+                        <div class="token-layout">
+                            <!-- 统计卡片区域 -->
+                            <div class="token-cards-section">
+                                <div class="token-summary-card cache-card">
+                                    <div class="token-summary-icon">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                            <circle cx="6" cy="6" r="1"/>
+                                            <circle cx="18" cy="18" r="1"/>
+                                        </svg>
+                                    </div>
+                                    <div class="token-summary-text">
+                                        <h3>Cache Tokens</h3>
+                                        <div class="token-total-value" id="total-cache-tokens">0</div>
+                                        <div class="token-subtitle">Creation + Read tokens</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="token-summary-card input-card">
+                                    <div class="token-summary-icon">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 12l2 2 4-4"/>
+                                            <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="token-summary-text">
+                                        <h3>Input Tokens</h3>
+                                        <div class="token-total-value" id="total-input-tokens">0</div>
+                                        <div class="token-subtitle">User input tokens</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="token-summary-card output-card">
+                                    <div class="token-summary-icon">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 12l2 2 4-4"/>
+                                            <path d="M21 12c.5 0 .9-.4.9-.9V7.1c0-.5-.4-.9-.9-.9H3c-.5 0-.9.4-.9.9v4c0 .5.4.9.9.9"/>
+                                            <path d="M21 12v4c0 .5-.4.9-.9.9H3c-.5 0-.9-.4-.9-.9v-4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="token-summary-text">
+                                        <h3>Output Tokens</h3>
+                                        <div class="token-total-value" id="total-output-tokens">0</div>
+                                        <div class="token-subtitle">Claude's responses</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="token-summary-card total-card">
+                                    <div class="token-summary-icon">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                            <circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                    </div>
+                                    <div class="token-summary-text">
+                                        <h3>Total Tokens</h3>
+                                        <div class="token-total-value" id="total-all-tokens">0</div>
+                                        <div class="token-subtitle">All tokens combined</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 数据可视化区域 -->
+                        <div class="token-visualization-section">
+                            <div class="token-visualization-header">
+                                <h4>使用数据</h4>
+                                <div class="view-toggle-container">
+                                    <div class="view-toggle">
+                                        <button class="toggle-btn active" id="chart-toggle">图表</button>
+                                        <button class="toggle-btn" id="table-toggle">表格</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 图表视图 -->
+                            <div class="chart-container" id="chart-container">
+                                <canvas id="usage-chart"></canvas>
+                            </div>
+                            
+                            <!-- 表格视图 -->
+                            <div class="token-table-container" id="table-container" style="display: none;">
+                                <table class="daily-usage-table">
+                                    <thead>
+                                        <tr>
+                                            <th>日期</th>
+                                            <th>Input</th>
+                                            <th>Output</th>
+                                            <th>Cache</th>
+                                            <th>总计</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="daily-usage-tbody">
+                                        <!-- 每日使用数据将在这里显示 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="theme-toggle.js"></script>
+    <script src="mcp-manager.js"></script>
+    <script src="chat-history.js"></script>
+    <script src="script.js"></script>
+    <script src="settings.js"></script>
+</body>
+</html>
