@@ -1,4 +1,5 @@
 # Claude code GUI
+inportant!:this tool is not made from anthropic
 ### Technology stack
 1. For conmmunicating withing server and client: I build a server my self ,using websocket,as you see in server.js,the working dictionary changing, client communicating and mcp installing, are all finished by this file
 2. For mcp installing: I use ther separeted files: server.js, mcp-manager.js and server_new_api.js,except mcp-manager.js, the other two files are all used to run install commands using spwan. the mcp-manager.js, are used for showning the installation of MCP servers.I also put some common MCP, convient for you to use.
